@@ -93,8 +93,8 @@ jobs:
         run: |
           eb init -p python-3.6 hello-world --region us-east-1
 
-      # Create the Elastic Beanstalk environment
-      - name: Create test environment
+      # Deploy to (or Create) the Elastic Beanstalk environment
+      - name: Create test environment & deploy
         run: |
-          eb create test-environment
+          (eb use test-environment && eb status test-environment && eb deploy) || eb create test-environment
 
