@@ -1,0 +1,29 @@
+- pipeline: "Build & Test"
+  trigger_mode: "ON_EVERY_PUSH"
+  ref_name: "main"
+  ref_type: "BRANCH"
+  fail_on_prepare_env_warning: true
+  trigger_condition: "ALWAYS"
+  actions:
+  - action: "Execute: test_application.py"
+    type: "BUILD"
+    working_directory: "/buddy/python-github-actions-demo"
+    docker_image_name: "library/python"
+    docker_image_tag: "3.6.12"
+    execute_commands:
+    - "pip install -r requirements.txt"
+    - "python test_application.py"
+    cached_dirs:
+    - "/root/.cache/pip"
+    volume_mappings:
+    - "/:/buddy/python-github-actions-demo"
+    trigger_condition: "ALWAYS"
+    shell: "BASH"
+  - action: "Upload files to Elastic Beanstalk/AWSPythonDemo"
+    type: "ELASTIC_BEANSTALK"
+    application_name: "AWSPythonDemo"
+    environment: "e-nmhmb6tqe8"
+    environment_name: "Awspythondemo-env (e-nmhmb6tqe8)"
+    region: "us-east-1"
+    trigger_condition: "ALWAYS"
+    integration_hash: "5fa84a366f3053434c47ee52"
