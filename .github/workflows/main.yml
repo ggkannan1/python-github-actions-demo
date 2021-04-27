@@ -1,4 +1,4 @@
-name: CI
+name: main CI/CD
 
 on:
   push:
@@ -98,3 +98,12 @@ jobs:
         run: |
           (eb use main-environment && eb status main-environment && eb deploy) || eb create main-environment
 
+      # Notify to Slack
+      - name: Report Status
+        if: always()
+        uses: ravsamhq/notify-slack-action@master
+        with:
+          status: ${{ job.status }}
+          notify_when: 'failure'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.ACTION_MONITORING_SLACK }}
