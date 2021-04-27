@@ -1,8 +1,10 @@
-name: CI
+name: main CI/CD
 
 on:
   push:
     branches: [main]
+    paths-ignore:
+          - '.github/**'      
 
 jobs:
   build:
@@ -98,3 +100,32 @@ jobs:
         run: |
           (eb use main-environment && eb status main-environment && eb deploy) || eb create main-environment
 
+      # Notify to Slack
+      - name: Report Status
+        if: always()
+        uses: ravsamhq/notify-slack-action@master
+        with:
+          status: ${{ job.status }}
+          notify_when: 'failure'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.ACTION_MONITORING_SLACK }}
+      
+      # Notify via Mail
+      - name: Send mail
+        if: always()
+        uses: dawidd6/action-send-mail@v2
+        with:
+          # mail server settings
+          server_address: smtp.gmail.com
+          server_port: 465
+          # user credentials
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          # email subject
+          subject: ${{ github.job }} job of ${{ github.repository }} has ${{ job.status }}
+          # email body as text
+          body: ${{ github.job }} job in worflow ${{ github.workflow }} of ${{ github.repository }} has ${{ job.status }}
+          # comma-separated string, send email to
+          to: ggkannan1@gmail.com
+          # from email name
+          from: Kannan Panneerselvam
